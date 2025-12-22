@@ -151,4 +151,96 @@ class Vector{
             return old_size - _size;
         }
 
+        void swap(T& a, T& b){
+            T temp = a;
+            a = b;
+            b = temp;
+        }
+
+        void bubbleSort(Rank lo, Rank hi){
+            bool exchange = true;
+            while(exchange == true){
+                exchange = false;
+                for(int i = lo + 1; i < hi; i++){
+                    if (_elem[i] < _elem[i-1]){
+                        swap(_elem[i], _elem[i-1]);
+                        exchange = true;
+                    }
+                }
+            }
+            return;
+        }
+
+        void insertSort(Rank lo, Rank hi){
+            for(int i = lo + 1; i < hi; i++){
+                int j = i;
+                T temp = _elem[j];
+                while (j > lo && (temp < _elem[j-1])){
+                    _elem[j] = _elem[j-1];
+                    j--;
+                }
+                _elem[j] = temp;
+            }
+            return;
+        }
+
+        Rank max(Rank lo, Rank hi){
+            T e = _elem[lo];
+            Rank r = lo;
+            while(lo < hi){
+                if(_elem[lo] >= e){
+                    e = _elem[lo];
+                    r = lo;  
+                }
+                lo++;
+            }
+            return r;
+        }
+
+        void selectSort(Rank lo, Rank hi){
+            for (int i = hi-1; i > lo; i--){
+                swap (_elem[max(lo, i+1)], _elem[i]);
+            }
+            return;
+        }
+
+        void merge(Rank lo, Rank mi, Rank hi){
+            int lf = mi - lo;
+            int lr = hi - mi;
+            T* A = _elem + lo;
+            T* B = new T[lf];
+            for(int i = 0; i < lf; i++){
+                B[i] = A[i];
+            }
+            T* C = _elem + mi;
+            int i = 0, j = 0;
+            while(i < lf && j < lr){
+                if(B[i] <= C[j]){
+                    A[i+j] = B[i];
+                    i++;
+                }else{
+                    A[i+j] = C[j];
+                    j++;
+                }
+            }
+            while(i < lf){
+                A[i+j] = B[i];
+                i++;
+            }
+
+            delete[] B ;
+            return;
+        }
+
+        void mergesort(Rank lo, Rank hi){
+            Rank mi = (lo + hi) >> 1;
+            if(hi - lo > 2){
+                return;
+            }
+            mergesort(lo, mi);
+            mergesort(mi, hi);
+
+            merge(lo, mi, hi);
+        }
+
 };
