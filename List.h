@@ -66,6 +66,18 @@ public:
     ListNode<T>* first() const { return header->succ; }
     ListNode<T>* last() const { return trailer->pred; }
 
+    ListNode<T>* find(T const&e, int n, ListNode<T>* p){
+        int i = 0;
+        while(i < n){
+            p = p->pred;
+            if (p->data == e){
+                return p;
+            }
+            i++;
+        }
+        return nullptr;
+    }
+
     ListNode<T>* insertAsFirst(T const& e) {
         _size++;
         return header-> insertAsSucc(e);
@@ -88,6 +100,41 @@ public:
         delete p;
         _size--;
         return e; 
+    }
+
+    int deduplicate(){
+        if(_size < 2) return 0;
+        int old_size = _size;
+        ListNode<T>* p = header->succ;
+        int r = 0;
+        while (p != trailer){
+
+            ListNode<T>* q = p->succ;
+
+            if (find(p->data, r, p)){
+                remove(p);
+            }else{
+                r++;
+            }
+
+            p = q;
+        }
+        return old_size - _size;
+    }
+
+    int uniquify(){
+        if(_size < 2) return 0;
+        int old_size = _size;
+        ListNode<T>* p = header->succ;
+        while (p->succ != trailer){
+            ListNode<T>* q =p->succ;
+            if (q->data == p->data){
+                remove(q);
+            }else{
+                p = q;
+            }
+        }
+        return old_size -_size;
     }
 
     int clear(){
