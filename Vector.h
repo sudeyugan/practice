@@ -59,6 +59,9 @@ class Vector{
             return _size;
         }
 
+        bool empty(){
+            return _size <= 0;
+        }
         Rank insert(Rank r, T const& e){
             expand();
             for (int i = _size; i > r; i--){
@@ -187,6 +190,7 @@ class Vector{
         Rank max(Rank lo, Rank hi){
             T e = _elem[lo];
             Rank r = lo;
+            lo++;
             while(lo < hi){
                 if(_elem[lo] >= e){
                     e = _elem[lo];
@@ -234,7 +238,7 @@ class Vector{
 
         void mergesort(Rank lo, Rank hi){
             Rank mi = (lo + hi) >> 1;
-            if(hi - lo > 2){
+            if(hi - lo < 2){
                 return;
             }
             mergesort(lo, mi);

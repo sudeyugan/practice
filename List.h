@@ -52,6 +52,21 @@ protected:
         }
     }
 
+    ListNode<T>* selectMax(ListNode<T>* p, int n){
+        ListNode<T>* curr = p;
+        curr = curr->succ;
+        ListNode<T>* max = curr->pred; 
+        int i = 1;
+        while(curr != trailer && i < n){
+            if (curr->data >= max->data){
+                max = curr;
+            }
+            i++;
+            curr = curr->succ;
+        }
+        return max;
+    }
+
 
 
 public:
@@ -135,6 +150,47 @@ public:
             }
         }
         return old_size -_size;
+    }
+
+    void insertionSort(ListNode<T>* p, int n){
+        ListNode<T>* start = p;
+        p = p->succ;
+        int i = 1; 
+        while(p != trailer && i < n){
+            ListNode<T>* curr = p;
+            p = p->succ;
+            i++;
+            T e = curr->data;
+            ListNode<T>* low =curr->pred;
+            while ( low!= start->pred && e < low->data){
+                low = low->pred;
+            } 
+            if(low != curr->pred){
+                remove(curr);
+                insert(low->succ, e);
+            }
+        } 
+        return;
+    }
+
+    void selectionSort(ListNode<T>* p, int n){
+        ListNode<T>* back = p;
+        for(int i =0; i < n; i++){
+            back = back->succ;
+        }
+        ListNode<T>* head = p;
+
+        while(n > 0) {
+            ListNode<T>* max = selectMax(head, n);
+            insert(back, max->data);
+            if(max == head){
+                head = head->succ;
+            }
+            remove(max);
+            back = back->pred;
+            n--;
+        }
+        return;
     }
 
     int clear(){
