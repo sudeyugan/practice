@@ -16,4 +16,8 @@ public:
         return this->first()->data;
     }
 
+    bool empty(){
+        return List<T>::empty();
+    }
+
 };

@@ -4,7 +4,7 @@ template <typename T> struct ListNode{
     ListNode<T>* pred;
     ListNode<T>* succ;
 
-    ListNode(T d = 0, ListNode<T>* p = nullptr, ListNode<T>* s = nullptr):data(d), pred(p), succ(s){}
+    ListNode(T d=T(), ListNode<T>* p = nullptr, ListNode<T>* s = nullptr):data(d), pred(p), succ(s){}
 
     ListNode<T>* insertAsPred(T const& e);
     ListNode<T>* insertAsSucc(T const& e);
@@ -162,35 +162,71 @@ public:
             i++;
             T e = curr->data;
             ListNode<T>* low =curr->pred;
-            while ( low!= start->pred && e < low->data){
+            while ( low!= p->pred && e < low->data){
                 low = low->pred;
             } 
             if(low != curr->pred){
-                remove(curr);
-                insert(low->succ, e);
+                curr->pred->succ = curr->succ;
+                curr->succ->pred = curr->pred;
+                curr->succ = low->succ;
+                low->succ->pred = curr;
+                low->succ = curr;
+                curr->pred = low;
             }
         } 
         return;
     }
 
     void selectionSort(ListNode<T>* p, int n){
-        ListNode<T>* back = p;
-        for(int i =0; i < n; i++){
-            back = back->succ;
+        ListNode<T>* tail = p;
+        for(int i = 0; i < n; i++){
+            tail = tail->succ;
         }
-        ListNode<T>* head = p;
+        
+        ListNode<T>* head = p; 
 
-        while(n > 0) {
+        while(n > 1) { 
             ListNode<T>* max = selectMax(head, n);
-            insert(back, max->data);
-            if(max == head){
-                head = head->succ;
+            
+
+            if (max != tail->pred) {
+                if (max == head) {
+                    head = head->succ;
+                }
+                max->pred->succ = max->succ;
+                max->succ->pred = max->pred;
+
+                max->succ = tail;
+                max->pred = tail->pred;
+                tail->pred->succ = max;
+                tail->pred = max;
             }
-            remove(max);
-            back = back->pred;
+
+            tail = max;
             n--;
         }
-        return;
+    }
+
+    List<T>& operator=(List<T> const& L) {
+        if (this != &L) { // 防止自我赋值
+            clear(); // 先清空现有元素
+            copyNodes(L.first(), L.size()); // 再拷贝新元素
+        }
+        return *this;
+    }
+
+    void reverse() {
+        if (_size < 2) return;
+        ListNode<T>* curr = header;
+        while (curr != nullptr) {
+            ListNode<T>* temp = curr->pred;
+            curr->pred = curr->succ;
+            curr->succ = temp;
+            curr = curr->pred; 
+        }
+        ListNode<T>* temp = header;
+        header = trailer;
+        trailer = temp;
     }
 
     int clear(){
