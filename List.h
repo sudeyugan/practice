@@ -67,6 +67,23 @@ protected:
         return max;
     }
 
+    // 将节点 p 移动到节点 target 之前
+    void moveBefore(ListNode<T>* p, ListNode<T>* target) {
+        if (p == target || p->succ == target) return; // 位置没变，直接返回
+
+        // 1. 将 p 从当前位置“摘除”
+        p->pred->succ = p->succ; //
+        p->succ->pred = p->pred; //
+
+        // 2. 将 p 插入到 target 之前
+        p->pred = target->pred; //
+        p->succ = target;       //
+        
+        // 3. 更新 target 原前驱和 target 本身的指向
+        p->pred->succ = p;
+        target->pred = p;
+    }
+
 
 
 public:
@@ -152,6 +169,36 @@ public:
         return old_size -_size;
     }
 
+    void bubbleSort(ListNode<T>* p, int n) {
+        ListNode<T>* head = p->pred; // 确定排序区间的左边界
+        ListNode<T>* tail = p;
+        for (int i = 0; i < n; i++) tail = tail->succ; // 确定排序区间的右边界
+
+        bool swapped = true;
+        while (swapped) {
+            swapped = false;
+            ListNode<T>* curr = head->succ; // 从区间第一个元素开始
+            
+            // 在当前区间内对比相邻节点
+            // 注意：n-1 次比较，且不要越过 tail
+            for (int i = 1; i < n; i++) {
+                ListNode<T>* nextNode = curr->succ;
+                
+                if (curr->data > nextNode->data) {
+                    // 如果逆序，将 nextNode 移到 curr 之前
+                    moveBefore(nextNode, curr);
+                    swapped = true;
+                    // 移动后，curr 依然指向那个较大的元素，无需更新 curr 指针
+                    // 这样下一轮循环会继续用这个较大的元素跟它新的后继对比
+                } else {
+                    // 如果顺序正确，则前进到下一个节点
+                    curr = nextNode;
+                }
+            }
+            n--; // 每一轮冒泡后，末尾已就绪，缩减待排区间
+        }
+    }
+
     void insertionSort(ListNode<T>* p, int n){
         ListNode<T>* start = p;
         p = p->succ;
@@ -177,36 +224,40 @@ public:
         return;
     }
 
-    void selectionSort(ListNode<T>* p, int n){
-        ListNode<T>* tail = p;
-        for(int i = 0; i < n; i++){
-            tail = tail->succ;
-        }
-        
-        ListNode<T>* head = p; 
 
-        while(n > 1) { 
-            ListNode<T>* max = selectMax(head, n);
+    // 优化后的插入排序
+    void insertionSort(ListNode<T>* p, int n) {
+        for (int r = 0; r < n; r++) {
+            // 在 p 的前 r 个节点中寻找不大于 p->data 的最后者
+            ListNode<T>* target = find(p->data, r, p);
             
-
-            if (max != tail->pred) {
-                if (max == head) {
-                    head = head->succ;
-                }
-                max->pred->succ = max->succ;
-                max->succ->pred = max->pred;
-
-                max->succ = tail;
-                max->pred = tail->pred;
-                tail->pred->succ = max;
-                tail->pred = max;
-            }
-
-            tail = max;
-            n--;
+            ListNode<T>* nextNode = p->succ; // 记录下一个要处理的节点
+            
+            // 如果 find 返回 nullptr，说明 p 比前面所有都小，移到最前面
+            // 否则移到 target 的后面，即 target->succ 之前
+            moveBefore(p, (target ? target->succ : first()));
+            
+            p = nextNode; // 转向下一节点
         }
     }
 
+    void selectionSort(ListNode<T>* p, int n) {
+        ListNode<T>* head = p->pred; // 保持前边界
+        ListNode<T>* tail = p; 
+        for (int i = 0; i < n; i++) tail = tail->succ; // 找到后边界
+
+        while (n > 1) {
+            // 在 head->succ 及其后 n 个节点中找最大者
+            ListNode<T>* max = selectMax(head->succ, n); 
+            
+            // 将 max 移动到 tail 之前（即当前有序部分的头部）
+            moveBefore(max, tail); 
+            
+            // tail 指向刚刚移动过来的 max，范围缩小
+            tail = max; 
+            n--;
+        }
+    }
     List<T>& operator=(List<T> const& L) {
         if (this != &L) { // 防止自我赋值
             clear(); // 先清空现有元素
