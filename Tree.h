@@ -81,6 +81,37 @@ struct BinNode{
     }
 
     template <typename VST>
+    void traversePost_Iterative(VST& visit){
+        Stack<BinNodePosi(T)> S;
+        BinNodePosi(T) x = this;
+
+        while(true){
+            while(x){
+                S.push(x);
+                if(x->lc){
+                    x = x->lc; 
+                }else if(x->rc){
+                    x = x->rc;
+                }else{x = nullptr;}
+            }
+            if(S.empty()){break;}
+
+            x = S.pop();
+            visit(x->data);
+
+            if(S.empty()){break;}
+
+            BinNodePosi(T) t = S.top();
+
+            if (x == t->lc && t->rc){
+                x = t->rc;
+            }else{
+                x = nullptr;
+            }
+        }
+    }
+
+    template <typename VST>
     void traverseLevel(VST& visit) {
         Queue<BinNodePosi(T)> Q;
         if (this){
@@ -139,7 +170,11 @@ protected:
     }
 
     static int removeAt(BinNodePosi(T) x){
-
+        if(x == nullptr){return 0;}
+        int n;
+        n = 1 + removeAt(x->lc) + removeAt(x->rc);
+        delete x;
+        return n;
     }
 public:
     BinTree() : _size(0), _root(nullptr) {}
@@ -166,9 +201,71 @@ public:
     }
 
     int remove(BinNodePosi(T) x){
-        if(x == x->parent-> 
-        )
+        BinNodePosi(T) p = x->parent; 
+        if(p){
+            if(x == p->lc){
+                p->lc = nullptr;
+            }else{
+                p->rc = nullptr;
+            }
+        }else{
+            _root = nullptr;
+        }
+        int n = removeAt(x);
+        _size -= n;
+        if(p){
+            updateHeightAbove(p);
+        }
+        return n;
+    }
 
+    BinNodePosi(T) attachAsLC(BinNodePosi(T) x, BinTree<T>* &S){
+        x->lc = S->root();
+        if(x->lc){
+            x->lc->parent = x;
+        }
+
+        _size += S->_size;
+        delete S;
+        S = nullptr;
+
+        updateHeightAbove(x);
+        return x;
+    }
+
+    BinNodePosi(T) attachAsRC(BinNodePosi(T) x, BinTree<T>* &S){
+        x->rc = S->root();
+        if(x->rc){
+            x->rc->parent = x;
+        }
+
+        _size += S->_size;
+        delete S;
+        S = nullptr;
+
+        updateHeightAbove(x);
+        return x;
+    }
+
+    BinTree<T>* secede(BinNodePosi(T) x){
+        BinNodePosi(T) p = x->parent;
+        if(p){
+            if(x == p->lc){
+                p->lc = nullptr;
+            }else{
+                p->rc = nullptr;
+            }
+        }else{
+            _root = nullptr；
+        }
+        BinTree<T>* S = new BinTree<T>;
+        S->_root = x;
+        x->parent = nullptr;
+
+        _size -= x->size();
+        updateHeightAbove(p);
+
+        return S;
     }
 
     
