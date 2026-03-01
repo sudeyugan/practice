@@ -256,7 +256,7 @@ public:
                 p->rc = nullptr;
             }
         }else{
-            _root = nullptr；
+            _root = nullptr;
         }
         BinTree<T>* S = new BinTree<T>;
         S->_root = x;
