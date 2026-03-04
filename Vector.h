@@ -58,7 +58,7 @@ public:
         copyFrom(V._elem, 0, V._size);
     }
 
-    // 【新增】赋值运算符重载 (防止内存泄漏/Double Free)
+    // 赋值运算符重载 (防止内存泄漏/Double Free)
     Vector<T>& operator=(Vector<T> const& V) {
         if (_elem) delete[] _elem;
         copyFrom(V._elem, 0, V._size);
@@ -153,6 +153,8 @@ public:
         return lo - 1;
     }
 
+    Rank search(T const& e) const {return search(e, 0, _size);}
+
     // 有序去重 (O(n))
     int uniquify() {
         if (_size < 2) return 0;
@@ -174,7 +176,6 @@ public:
     }
 
     // ==========================================
-    //            排序算法区 (SORTING)
     //    注意：所有区间均为 [lo, hi) 左闭右开
     // ==========================================
 
